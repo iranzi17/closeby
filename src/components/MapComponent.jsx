@@ -15,9 +15,9 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-const MapComponent = ({ currentUser, shareLocation }) => {
-  const [users, setUsers] = useState([]);
-  const [position, setPosition] = useState(null);
+const MapComponent = ({ currentUser, shareLocation, mockUsers = null, mockPosition = null }) => {
+  const [users, setUsers] = useState(mockUsers || []);
+  const [position, setPosition] = useState(mockPosition);
 
   // Custom marker icon
   const icon = new L.Icon({
@@ -28,11 +28,12 @@ const MapComponent = ({ currentUser, shareLocation }) => {
   });
 
   // Get user's current position and optionally update Firestore
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      console.error("Geolocation is not supported.");
-      return;
-    }
+    useEffect(() => {
+      if (mockPosition) return;
+      if (!navigator.geolocation) {
+        console.error("Geolocation is not supported.");
+        return;
+      }
 
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
@@ -55,15 +56,16 @@ const MapComponent = ({ currentUser, shareLocation }) => {
   }, [shareLocation, currentUser]);
 
   // Listen to shared users' locations
-  useEffect(() => {
-    const q = query(collection(db, "users"), where("shareLocation", "==", true));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const usersList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setUsers(usersList);
-    });
+    useEffect(() => {
+      if (mockUsers) return;
+      const q = query(collection(db, "users"), where("shareLocation", "==", true));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const usersList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setUsers(usersList);
+      });
 
-    return () => unsubscribe();
-  }, []);
+      return () => unsubscribe();
+    }, [mockUsers]);
 
   return (
     <div style={{ height: "90vh", width: "100%" }}>
