@@ -2,10 +2,6 @@ import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import useGeolocation from "../hooks/useGeolocation";
-
-const MapComponent = ({ currentUser }) => {
-  const { position, markers, shareLocation, stopSharing } = useGeolocation(currentUser);
 
   const icon = new L.Icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -14,12 +10,7 @@ const MapComponent = ({ currentUser }) => {
     popupAnchor: [1, -34],
   });
 
-  return (
-    <div style={{ height: "90vh", width: "100%" }}>
-      <button onClick={shareLocation}>Share Location</button>
-      <button onClick={stopSharing}>Stop Sharing</button>
-      <MapContainer
-        center={position ? [position.lat, position.lng] : [0, 0]}
+
         zoom={13}
         scrollWheelZoom
         style={{ height: "100%" }}
@@ -29,22 +20,20 @@ const MapComponent = ({ currentUser }) => {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {position && (
-          <Marker position={[position.lat, position.lng]} icon={icon}>
+
             <Popup>You are here</Popup>
           </Marker>
         )}
 
-        {markers.map((m) =>
-          m.lat && m.lng && m.uid !== currentUser.uid ? (
+
             <Marker key={m.uid} position={[m.lat, m.lng]} icon={icon}>
               <Popup>{m.email || "User"}</Popup>
             </Marker>
-          ) : null
-        )}
+          ))}
       </MapContainer>
     </div>
   );
 };
 
 export default MapComponent;
+
