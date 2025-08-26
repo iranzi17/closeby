@@ -2,10 +2,6 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Environment Setup
-
-1. Copy `.env.example` to `.env.local`.
-2. Replace the placeholder values with your Firebase project credentials.
 
 ## Available Scripts
 
