@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import { auth } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 
-function LoginForm() {
+function LoginForm({ onLogin, onRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -38,10 +33,10 @@ function LoginForm() {
     setLoading(true);
     try {
       if (isRegistering) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        await onRegister(email, password);
         setSuccessMessage("✅ Registration successful!");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        await onLogin(email, password);
         setSuccessMessage("✅ Login successful!");
       }
     } catch (error) {
