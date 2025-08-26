@@ -1,0 +1,42 @@
+type User @table {
+  username: String!
+  email: String!
+  createdAt: Timestamp!
+  displayName: String
+  profilePictureUrl: String
+  bio: String
+  interests: [String]
+}
+
+type HangoutEvent @table {
+  name: String!
+  description: String!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  location: String!
+  isPublic: Boolean!
+  createdAt: Timestamp!
+  maxAttendees: Int
+  creator: User
+}
+
+type Participation @table(key: ["user", "hangoutEvent"]) {
+  user: User!
+  hangoutEvent: HangoutEvent!
+  status: String!
+  createdAt: Timestamp!
+}
+
+type Friendship @table(key: ["user1", "user2"]) {
+  user1: User!
+  user2: User!
+  status: String!
+  createdAt: Timestamp!
+}
+
+type Message @table {
+  content: String!
+  createdAt: Timestamp!
+  sender: User
+  hangoutEvent: HangoutEvent
+}

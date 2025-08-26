@@ -1,75 +1,130 @@
-// File: firebaseConfig.js
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC6U0unu3JeeyT6vmR53VUgRbV10T1mWRH8",
-  authDomain: "closeby-app-b70a1.firebaseapp.com",
-  databaseURL: "https://closeby-app-b70a1-default-rtdb.firebaseio.com",
-  projectId: "closeby-app-b70a1",
-  storageBucket: "closeby-app-b70a1.appspot.com",
-  messagingSenderId: "547769823139",
-  appId: "1:547769823139:web:e9e362816684fedd3d1d16",
-  measurementId: "G-MKL1L2K7Q1"
-};
-
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getDatabase(app);
-
 import React, { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { ref, set, remove } from "firebase/database";
-import { auth, db } from "./firebaseConfig";
-import MapView from "./components/MapView";
-import LoginForm from "./components/LoginForm";
+import { auth, db } from './firebase'; // ✅ FIXED: Import both `auth` and `db`
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import {
+  doc,
+  setDoc,
+  updateDoc,
+  getDoc,
+  onSnapshot,
+  collection,
+} from "firebase/firestore";
+import MapComponent from "./components/MapComponent";
 
 function App() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [sharing, setSharing] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [allLocations, setAllLocations] = useState([]);
 
+  // 🔐 Listen to auth changes
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        const docRef = doc(db, "locations", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setLocation(docSnap.data());
+        }
+      } else {
+        setUser(null);
+        setLocation(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 📡 Fetch all shared user locations
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "locations"), (snapshot) => {
+      const sharedLocations = snapshot.docs
+        .map(doc => doc.data())
+        .filter(data => data.sharing === true);
+      setAllLocations(sharedLocations);
     });
     return () => unsub();
   }, []);
 
-  const toggleSharing = () => {
-    if (!sharing) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const locRef = ref(db, `locations/${user.uid}`);
-        set(locRef, {
-          name: user.email,
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setSharing(true);
+  // ✅ Register new user
+  const register = async () => {
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, "locations", res.user.uid), {
+        uid: res.user.uid,
+        email: res.user.email,
+        sharing: false,
+        lat: null,
+        lng: null,
       });
-    } else {
-      remove(ref(db, `locations/${user.uid}`));
-      setSharing(false);
+    } catch (err) {
+      alert(err.message);
     }
   };
 
-  if (!user) return <LoginForm />;
+  // ✅ Login
+  const login = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // 🚪 Logout
+  const logout = () => {
+    signOut(auth);
+  };
+
+  // 📍 Share location
+  const shareLocation = () => {
+    if (!navigator.geolocation) return alert("Geolocation not supported.");
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      await updateDoc(doc(db, "locations", user.uid), {
+        lat: latitude,
+        lng: longitude,
+        sharing: true,
+      });
+    });
+  };
+
+  // 🚫 Stop sharing
+  const stopSharing = async () => {
+    await updateDoc(doc(db, "locations", user.uid), {
+      sharing: false,
+      lat: null,
+      lng: null,
+    });
+  };
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-xl font-bold">Welcome, {user.email}</h1>
-        <button onClick={() => signOut(auth)} className="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
-      </div>
-      <button onClick={toggleSharing} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-        {sharing ? "Stop Sharing" : "Share My Location"}
-      </button>
-      <MapView currentUserId={user.uid} />
+    <div>
+      {!user ? (
+        <div>
+          <h2>Register</h2>
+          <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+          <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+          <button onClick={register}>Register</button>
+          <span> Already have an account? <button onClick={login}>Login</button> </span>
+        </div>
+      ) : (
+        <div>
+          <h2>Welcome, {user.email}</h2>
+          <button onClick={logout}>Logout</button>
+          <button onClick={shareLocation}>Share Location</button>
+          <button onClick={stopSharing}>Stop Sharing</button>
+          <MapComponent userLocation={location} markers={allLocations} />
+        </div>
+      )}
     </div>
   );
 }
 
 export default App;
-
-// Remove the LoginForm and MapView component code from this file.
-// Keep only the App component and its export here.

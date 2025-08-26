@@ -1,0 +1,47 @@
+mutation CreateHangoutEvent @auth(level: USER) {
+  hangoutEvent_insert(
+    data: {
+      name: "New Hangout"
+      description: "A fun new hangout event"
+      location: "Some Location"
+      startTime: "2024-04-01T12:00:00Z"
+      endTime: "2024-04-01T14:00:00Z"
+      isPublic: true
+    }
+  )
+}
+
+query ListPublicHangoutEvents @auth(level: PUBLIC) {
+  hangoutEvents(where: { isPublic: { eq: true } }) {
+    id
+    name
+    description
+    location
+    startTime
+    endTime
+  }
+}
+
+mutation JoinHangoutEvent($hangoutEventId: UUID!) @auth(level: USER) {
+  participation_insert(
+    data: {
+      hangoutEventId: $hangoutEventId
+      userId_expr: "auth.uid"
+      status: "pending"
+    }
+  )
+}
+
+query GetMyParticipations @auth(level: USER) {
+  participations(where: { userId_expr: "auth.uid" }) {
+    hangoutEvent {
+      id
+      name
+      description
+      location
+      startTime
+      endTime
+    }
+    status
+  }
+}

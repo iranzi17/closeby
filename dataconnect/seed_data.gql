@@ -1,0 +1,16 @@
+mutation PopulateDatabaseWithSeedData @auth(level: USER) {
+  user_insertMany(data: [
+    {
+      email: "user1@example.com",
+      username: "user1",
+      createdAt_expr: "request.time",
+      displayName: "User One"
+    },
+    {
+      email: "user2@example.com",
+      username: "user2",
+      createdAt_expr: "request.time",
+      displayName: "User Two"
+    }
+  ])
+}
