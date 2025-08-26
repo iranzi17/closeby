@@ -1,8 +1,8 @@
+import React from "react";
+import { render } from "@testing-library/react";
+import LoginForm from "./LoginForm";
 
-jest.mock('firebase/auth', () => ({
-  createUserWithEmailAndPassword: jest.fn(),
-  signInWithEmailAndPassword: jest.fn(),
-}));
-
-
+test("renders login form", () => {
+  render(<LoginForm onLogin={jest.fn()} onRegister={jest.fn()} />);
 });
+
