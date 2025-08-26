@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Custom Hooks
+
+Two reusable hooks power authentication and location sharing:
+
+- `useAuth` — exposes `{ user, register, login, logout }` for Firebase Authentication.
+- `useGeolocation` — exposes `{ position, markers, shareLocation, stopSharing }` to sync device location with Firestore.
+
 ## Available Scripts
 
 In the project directory, you can run:
