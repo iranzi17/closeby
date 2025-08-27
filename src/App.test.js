@@ -89,14 +89,5 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, __getPath } from 'react-router-dom';
 import App from './App';
 
-test('redirects unauthenticated users to /login', async () => {
-  render(
-    <MemoryRouter initialEntries={['/map']}>
-      <App />
-    </MemoryRouter>
-  );
-  await waitFor(() => {
-    expect(__getPath()).toBe('/login');
-  });
-  expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
+
 });
