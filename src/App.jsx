@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth, db } from './firebase'; // ✅ FIXED: Import both `auth` and `db`
+import { auth, db } from './firebaseConfig';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -120,7 +120,7 @@ function App() {
           <button onClick={logout}>Logout</button>
           <button onClick={shareLocation}>Share Location</button>
           <button onClick={stopSharing}>Stop Sharing</button>
-          <MapComponent userLocation={location} markers={allLocations} />
+          <MapComponent currentUser={user} />
         </div>
       )}
     </div>

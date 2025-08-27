@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { db } from "../firebase";
+import { db } from "../firebaseConfig";
 import {
   collection,
   doc,
@@ -15,7 +15,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-const MapComponent = ({ currentUser, shareLocation }) => {
+const MapComponent = ({ currentUser }) => {
   const [users, setUsers] = useState([]);
   const [position, setPosition] = useState(null);
 
@@ -27,7 +27,7 @@ const MapComponent = ({ currentUser, shareLocation }) => {
     popupAnchor: [1, -34],
   });
 
-  // Get user's current position and optionally update Firestore
+  // Get user's current position
   useEffect(() => {
     if (!navigator.geolocation) {
       console.error("Geolocation is not supported.");
@@ -35,24 +35,16 @@ const MapComponent = ({ currentUser, shareLocation }) => {
     }
 
     const watchId = navigator.geolocation.watchPosition(
-      async (pos) => {
+      (pos) => {
         const { latitude, longitude } = pos.coords;
         setPosition([latitude, longitude]);
-
-        if (shareLocation && currentUser?.uid) {
-          await updateDoc(doc(db, "users", currentUser.uid), {
-            lat: latitude,
-            lng: longitude,
-            lastUpdated: serverTimestamp(),
-          });
-        }
       },
       (err) => console.error(err),
       { enableHighAccuracy: true, maximumAge: 10000 }
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [shareLocation, currentUser]);
+  }, []);
 
   // Listen to shared users' locations
   useEffect(() => {
