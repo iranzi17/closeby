@@ -2,9 +2,15 @@ import React from "react";
 import useAuth from "./hooks/useAuth";
 import LoginForm from "./components/LoginForm";
 import MapComponent from "./components/MapComponent";
+import FirebaseWarning from "./components/FirebaseWarning";
+import { firebaseInitError } from "./firebase";
 
 function App() {
   const { user, login, register, logout } = useAuth();
+
+  if (firebaseInitError) {
+    return <FirebaseWarning />;
+  }
 
   return (
     <div>
