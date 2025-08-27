@@ -34,18 +34,24 @@ export default function useGeolocation(user) {
     }
     if (watchIdRef.current) return;
 
-    watchIdRef.current = navigator.geolocation.watchPosition(async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      setPosition({ lat: latitude, lng: longitude });
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setPosition({ lat: latitude, lng: longitude });
 
-      if (user?.uid) {
-        await updateDoc(doc(db, "locations", user.uid), {
-          lat: latitude,
-          lng: longitude,
-          sharing: true,
-        });
+        if (user?.uid) {
+          await updateDoc(doc(db, "locations", user.uid), {
+            lat: latitude,
+            lng: longitude,
+            sharing: true,
+          });
+        }
+      },
+      (error) => {
+        console.error("Error watching position", error);
+        alert("Unable to retrieve location.");
       }
-    });
+    );
   };
 
   const stopSharing = async () => {
@@ -62,6 +68,13 @@ export default function useGeolocation(user) {
       });
     }
   };
+
+  useEffect(() => {
+    return () => {
+      stopSharing();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { position, markers, shareLocation, stopSharing };
 }
