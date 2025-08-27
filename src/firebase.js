@@ -16,11 +16,22 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app;
+let auth = null;
+let db = null;
+let firebaseInitError = false;
 
-// Export services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+try {
+  // Initialize Firebase
+  app = initializeApp(firebaseConfig);
+  // Export services
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (error) {
+  console.error("Firebase config incomplete", error);
+  firebaseInitError = true;
+}
+
+export { auth, db, firebaseInitError };
 // Optional: export const realtimeDB = getDatabase(app);
 // Optional: export const storage = getStorage(app);

@@ -21,11 +21,13 @@ export default function useAuth() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    if (!auth) return undefined;
     const unsub = onAuthStateChanged(auth, setUser);
     return () => unsub();
   }, []);
 
   const register = async (email, password) => {
+    if (!auth || !db) throw new Error("Firebase not initialized");
     const res = await createUserWithEmailAndPassword(auth, email, password);
     await setDoc(doc(db, "locations", res.user.uid), {
       uid: res.user.uid,
@@ -37,9 +39,15 @@ export default function useAuth() {
     return res.user;
   };
 
-  const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
+  const login = (email, password) => {
+    if (!auth) throw new Error("Firebase not initialized");
+    return signInWithEmailAndPassword(auth, email, password);
+  };
 
-  const logout = () => signOut(auth);
+  const logout = () => {
+    if (!auth) throw new Error("Firebase not initialized");
+    return signOut(auth);
+  };
 
   return { user, register, login, logout };
 }
