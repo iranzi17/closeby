@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isValid(data, uid) {
+      return data.keys().hasAll(['uid', 'sharing']) &&
+             data.uid == uid &&
+             data.uid == request.auth.uid &&
+             data.sharing is bool;
+    }
+
+    match /locations/{uid} {
+      // Allow owner to read their document or anyone to read shared documents
+      allow get: if isOwner(uid) || resource.data.sharing == true;
+      // Allow queries only when filtering for shared locations
+      allow list: if request.query.where('sharing', '==', true);
+      // Allow owner to create or update their document with valid fields
+      allow create, update: if isOwner(uid) && isValid(request.resource.data, uid);
+      // Allow owner to delete their document
+      allow delete: if isOwner(uid);
+    }
+  }
+}
