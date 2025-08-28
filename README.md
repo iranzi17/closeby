@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+
+## Environment Setup
+
+Copy the example environment file and update it with your Firebase credentials:
+
+```bash
+cp .env.example .env
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -69,8 +78,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-## Firebase Auth and Data Connect
 
-When calling the Firebase Data Connect GraphQL endpoint, include a Firebase ID token in the `Authorization` header (`Bearer <token>`).
-Data Connect verifies the token and makes its claims available to authorization expressions such as `auth.uid` inside your GraphQL queries.
-The service helpers in `src/api/events.js` obtain the token via `user.getIdToken()` and forward it to the API client so Data Connect can enforce user-level access.
