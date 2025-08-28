@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC6UunoU3eeyT6vmR53VUgRbv10IlmWRH8",
+ apiKey: "AIzaSyC6UunoU3eeyT6vmR53VUgRbv10IlmWRH8",
   authDomain: "closeby-app-b70a1.firebaseapp.com",
   databaseURL: "https://closeby-app-b70a1-default-rtdb.firebaseio.com",
   projectId: "closeby-app-b70a1",
