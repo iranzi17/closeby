@@ -78,16 +78,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-## Firestore Security Rules
 
-Deploy the rules using:
-
-```sh
-firebase deploy --only firestore:rules
-```
-
-You can test the rules locally with the Firebase Emulator Suite:
-
-```sh
-firebase emulators:start --only firestore
-```
