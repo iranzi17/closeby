@@ -7,7 +7,7 @@ const firebaseConfig = {
   authDomain: "closeby-app-b70a1.firebaseapp.com",
   databaseURL: "https://closeby-app-b70a1-default-rtdb.firebaseio.com",
   projectId: "closeby-app-b70a1",
-  storageBucket: "closeby-app-b70a1.firebasestorage.app",
+  storageBucket: "closeby-app-b70a1.appspot.com", // <-- FIXED
   messagingSenderId: "547769023139",
   appId: "1:547769023139:web:e9e3602166874fedd31d16",
   measurementId: "G-MKL1L2K7Q1"
@@ -17,3 +17,4 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);        // ✅ Keep this
 export const db = getFirestore(app);     // ✅ Now exports Firestore
+// export const analytics = getAnalytics(app); // Optional
