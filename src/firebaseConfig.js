@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-
+npm install firebase
 const firebaseConfig = {
  apiKey: "AIzaSyC6UunoU3eeyT6vmR53VUgRbv10IlmWRH8",
   authDomain: "closeby-app-b70a1.firebaseapp.com",
