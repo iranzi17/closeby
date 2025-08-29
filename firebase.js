@@ -1,1 +1,1 @@
-export { auth, db } from './src/firebaseConfig';
+export { auth, db } from './src/firebase';
