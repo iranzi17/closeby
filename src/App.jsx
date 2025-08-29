@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MapComponent from "./components/MapComponent";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "./firebaseConfig";
 
 function App() {
   const [user, setUser] = useState(null);
