@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-
 import MapComponent from "./components/MapComponent";
-import { createEvent, joinEvent } from "./api/events";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase";
 
 function App() {
   const [user, setUser] = useState(null);
-
+  const [eventName, setEventName] = useState("");
+  const [joinId, setJoinId] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -16,39 +17,39 @@ function App() {
 
   const logout = () => signOut(auth);
 
-  // 🎉 Placeholder create/join event handlers using Data Connect
-  const handleCreateEvent = async () => {
-    try {
-      const token = await user.getIdToken();
-      await createEvent(
-        {
-          name: eventName,
-          description: 'Placeholder event',
-          location: 'TBD',
-          startTime: new Date().toISOString(),
-          endTime: new Date().toISOString(),
-          isPublic: true,
-        },
-        token
-      );
-      alert('Event created');
-    } catch (err) {
-      alert(err.message);
-    }
+  const handleCreateEvent = () => {
+    // Placeholder handler
+    alert(`Create event: ${eventName}`);
   };
 
-  const handleJoinEvent = async () => {
-    try {
-      const token = await user.getIdToken();
-      await joinEvent(joinId, token);
-      alert('Join request sent');
-    } catch (err) {
-      alert(err.message);
-    }
+  const handleJoinEvent = () => {
+    // Placeholder handler
+    alert(`Join event: ${joinId}`);
   };
 
   return (
-
+    <div>
+      {user && <MapComponent currentUser={user} />}
+      <div>
+        <input
+          type="text"
+          placeholder="Event name"
+          value={eventName}
+          onChange={(e) => setEventName(e.target.value)}
+        />
+        <button onClick={handleCreateEvent}>Create Event</button>
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Join ID"
+          value={joinId}
+          onChange={(e) => setJoinId(e.target.value)}
+        />
+        <button onClick={handleJoinEvent}>Join Event</button>
+      </div>
+      <button onClick={logout}>Logout</button>
+    </div>
   );
 }
 
