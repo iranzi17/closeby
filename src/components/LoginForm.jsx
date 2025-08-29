@@ -1,39 +1,40 @@
 import React, { useState } from "react";
-
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
 
-function LoginForm() {
+function LoginForm({ onLogin, onRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState([]);
+  const [message, setMessage] = useState("");
+
+  const validate = () => {
+    const errs = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errs.push("Invalid email format");
+    }
+    if (password.length < 6) {
+      errs.push("Password must be at least 6 characters");
+    }
+    setErrors(errs);
+    return errs.length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+    if (!validate()) return;
     try {
       if (isRegistering) {
-        const res = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "locations", res.user.uid), {
-          uid: res.user.uid,
-          email: res.user.email,
-          sharing: false,
-          lat: null,
-          lng: null,
-        });
-        alert("✅ Registration successful!");
+        await onRegister(email, password);
+        setMessage("Registration successful");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("✅ Login successful!");
+        await onLogin(email, password);
+        setMessage("Login successful");
       }
-      navigate("/map");
     } catch (error) {
-      alert("❌ Error: " + error.message);
+      setMessage(error.message);
     }
   };
 
@@ -55,6 +56,10 @@ function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           className="login-input"
         />
+        {errors.map((err, idx) => (
+          <p key={idx}>{err}</p>
+        ))}
+        {message && <p>{message}</p>}
         <button type="submit" className="login-button">
           {isRegistering ? "Register" : "Login"}
         </button>
@@ -73,3 +78,4 @@ function LoginForm() {
 }
 
 export default LoginForm;
+
