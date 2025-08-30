@@ -1,54 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useAuth from "./hooks/useAuth";
+import LoginForm from "./components/LoginForm";
 import MapComponent from "./components/MapComponent";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import FirebaseWarning from "./components/FirebaseWarning";
+import { firebaseInitError } from "./firebase";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [eventName, setEventName] = useState("");
-  const [joinId, setJoinId] = useState("");
+  const { user, login, register, logout } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return unsubscribe;
-  }, []);
-
-  const logout = () => signOut(auth);
-
-  const handleCreateEvent = () => {
-    // Placeholder handler
-    alert(`Create event: ${eventName}`);
-  };
-
-  const handleJoinEvent = () => {
-    // Placeholder handler
-    alert(`Join event: ${joinId}`);
-  };
+  if (firebaseInitError) {
+    return <FirebaseWarning />;
+  }
 
   return (
     <div>
-      {user && <MapComponent currentUser={user} />}
-      <div>
-        <input
-          type="text"
-          placeholder="Event name"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-        />
-        <button onClick={handleCreateEvent}>Create Event</button>
-      </div>
-      <div>
-        <input
-          type="text"
-          placeholder="Join ID"
-          value={joinId}
-          onChange={(e) => setJoinId(e.target.value)}
-        />
-        <button onClick={handleJoinEvent}>Join Event</button>
-      </div>
-      <button onClick={logout}>Logout</button>
+      {!user ? (
+        <LoginForm onLogin={login} onRegister={register} />
+      ) : (
+        <div>
+          <h2>Welcome, {user.email}</h2>
+          <button onClick={logout}>Logout</button>
+          <MapComponent currentUser={user} />
+        </div>
+      )}
     </div>
   );
 }
