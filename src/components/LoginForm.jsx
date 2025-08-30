@@ -1,81 +1,93 @@
 import React, { useState } from "react";
-import "./LoginForm.css";
 
 function LoginForm({ onLogin, onRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
-  const [errors, setErrors] = useState([]);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const validate = () => {
-    const errs = [];
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      errs.push("Invalid email format");
+    let valid = true;
+    setEmailError("");
+    setPasswordError("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Invalid email format");
+      valid = false;
     }
     if (password.length < 6) {
-      errs.push("Password must be at least 6 characters");
+      setPasswordError("Password must be at least 6 characters");
+      valid = false;
     }
-    setErrors(errs);
-    return errs.length === 0;
+    return valid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setSuccessMessage("");
+    setFormError("");
     if (!validate()) return;
+    setLoading(true);
     try {
       if (isRegistering) {
         await onRegister(email, password);
-        setMessage("Registration successful");
+        setSuccessMessage("✅ Registration successful!");
       } else {
         await onLogin(email, password);
-        setMessage("Login successful");
+        setSuccessMessage("✅ Login successful!");
       }
     } catch (error) {
-      setMessage(error.message);
+      setFormError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <h2 className="login-heading">{isRegistering ? "Register" : "Login"}</h2>
-      <form onSubmit={handleSubmit} className="login-form">
+    <div className="max-w-md mx-auto mt-10">
+      <h2 className="text-2xl mb-4">{isRegistering ? "Register" : "Login"}</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="login-input"
+          className="border px-4 py-2"
         />
+        {emailError && <span className="text-red-500 text-sm">{emailError}</span>}
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="login-input"
+          className="border px-4 py-2"
         />
-        {errors.map((err, idx) => (
-          <p key={idx}>{err}</p>
-        ))}
-        {message && <p>{message}</p>}
-        <button type="submit" className="login-button">
-          {isRegistering ? "Register" : "Login"}
+        {passwordError && <span className="text-red-500 text-sm">{passwordError}</span>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {loading ? "Submitting..." : isRegistering ? "Register" : "Login"}
         </button>
         <button
           type="button"
           onClick={() => setIsRegistering(!isRegistering)}
-          className="toggle-button"
+          disabled={loading}
+          className="text-blue-500 underline disabled:opacity-50"
         >
           {isRegistering
             ? "Already have an account? Login"
             : "Don't have an account? Register"}
         </button>
+        {formError && <div className="text-red-500">❌ {formError}</div>}
+        {successMessage && <div className="text-green-600">{successMessage}</div>}
       </form>
     </div>
   );
 }
 
 export default LoginForm;
-
