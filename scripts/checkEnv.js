@@ -35,16 +35,7 @@ if (missing.length) {
   missing.forEach((key) => {
     console.error(`  ${key}  (example: ${required[key]})`);
   });
-
-  const isCi = process.env.CI === "true" || Boolean(process.env.NETLIFY);
-
-  if (isCi) {
-    console.log(
-      "⚠️  Continuing without required env vars because CI/Netlify is set."
-    );
-  } else {
-    process.exit(1);
-  }
-} else {
-  console.log("✅ All required env vars are set.");
+  process.exit(1);
 }
+
+console.log("✅ All required env vars are set.");

@@ -11,24 +11,8 @@ Copy the example environment file and update it with your Firebase credentials:
 cp .env.example .env
 ```
 
-Then populate the Firebase client configuration in `.env` using the keys that the
-app reads at runtime:
-
-```
-REACT_APP_API_KEY
-REACT_APP_AUTH_DOMAIN
-REACT_APP_DATABASE_URL
-REACT_APP_PROJECT_ID
-REACT_APP_STORAGE_BUCKET
-REACT_APP_MESSAGING_SENDER_ID
-REACT_APP_APP_ID
-REACT_APP_MEASUREMENT_ID
-REACT_APP_DATA_CONNECT_URL
-```
-
-Use the same key names when configuring environment variables in your Netlify site
-settings (or any other hosting provider) so `npm run build` can find them during the
-CI build and the Firebase client receives the expected values.
+Before building for deployment, be sure to populate the new `REACT_APP_DATA_CONNECT_URL`
+environment variable with the base URL of your Firebase Data Connect instance.
 
 ## Available Scripts
 
