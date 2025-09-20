@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import useGeolocation from "../hooks/useGeolocation";
 
 const icon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -14,7 +15,9 @@ const icon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-export default function MapComponent({ currentUser, position, markers }) {
+export default function MapComponent({ currentUser }) {
+  const { position, markers, shareLocation, stopSharing } =
+    useGeolocation(currentUser);
   // Debug log to confirm key injection
   useEffect(() => {
     console.log("✅ MapTiler Key:", process.env.REACT_APP_MAPTILER_KEY);
@@ -25,6 +28,14 @@ export default function MapComponent({ currentUser, position, markers }) {
 
   return (
     <div style={{ height: "90vh", width: "100%" }}>
+      <div style={{ marginBottom: "1rem", display: "flex", gap: "0.5rem" }}>
+        <button type="button" onClick={shareLocation}>
+          Share location
+        </button>
+        <button type="button" onClick={stopSharing}>
+          Stop sharing
+        </button>
+      </div>
       <MapContainer
         center={position ? [position.lat, position.lng] : [-1.9441, 30.0619]} // fallback: Kigali
         zoom={13}
