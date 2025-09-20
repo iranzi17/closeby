@@ -11,6 +11,9 @@ Copy the example environment file and update it with your Firebase credentials:
 cp .env.example .env
 ```
 
+Before building for deployment, be sure to populate the new `REACT_APP_DATA_CONNECT_URL`
+environment variable with the base URL of your Firebase Data Connect instance.
+
 ## Available Scripts
 
 In the project directory, you can run:
